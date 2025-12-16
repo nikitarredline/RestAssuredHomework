@@ -69,7 +69,7 @@ public class StoreTest {
     //Отправка запроса DELETE/store/order/{orderId} для несуществующего id и проверка в ответе статус кода, а также ключей и полей
     @Test
     void deleteStoreOrderIncorrectIdTest() {
-        storeApi.deleteStoreOrderIncorrectId(404, 123);
+        storeApi.deleteStoreOrderIncorrectId(404, generatedId);
     }
 
     @AfterEach
