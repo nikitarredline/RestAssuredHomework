@@ -15,7 +15,7 @@ public class StoreTest {
     private int generatedId = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
     private final List<Integer> createdOrders = new ArrayList<>();
 
-    //Отправка запроса POST/store/order и проверка в ответе статус кода, а также ключей и полей
+    //РћС‚РїСЂР°РІРєР° Р·Р°РїСЂРѕСЃР° POST/store/order Рё РїСЂРѕРІРµСЂРєР° РІ РѕС‚РІРµС‚Рµ СЃС‚Р°С‚СѓСЃ РєРѕРґР°, Р° С‚Р°РєР¶Рµ РєР»СЋС‡РµР№ Рё РїРѕР»РµР№
     @Test
     void postStoreOrderTest() {
         OrderDTO orderDTO = OrderDTO.builder()
@@ -31,7 +31,7 @@ public class StoreTest {
         createdOrders.add(generatedId);
     }
 
-    //Отправка запроса POST/store/order без поля status и проверка в ответе статус кода, а также ключей и полей
+    //РћС‚РїСЂР°РІРєР° Р·Р°РїСЂРѕСЃР° POST/store/order Р±РµР· РїРѕР»СЏ status Рё РїСЂРѕРІРµСЂРєР° РІ РѕС‚РІРµС‚Рµ СЃС‚Р°С‚СѓСЃ РєРѕРґР°, Р° С‚Р°РєР¶Рµ РєР»СЋС‡РµР№ Рё РїРѕР»РµР№
     @Test
     void postStoreOrderWithoutStatusTest() {
         OrderDTO orderDTO = OrderDTO.builder()
@@ -47,7 +47,7 @@ public class StoreTest {
     }
 
 
-    //Отправка запроса DELETE/store/order/{orderId} и проверка в ответе статус кода, а также ключей и полей
+    //РћС‚РїСЂР°РІРєР° Р·Р°РїСЂРѕСЃР° DELETE/store/order/{orderId} Рё РїСЂРѕРІРµСЂРєР° РІ РѕС‚РІРµС‚Рµ СЃС‚Р°С‚СѓСЃ РєРѕРґР°, Р° С‚Р°РєР¶Рµ РєР»СЋС‡РµР№ Рё РїРѕР»РµР№
     @Test
     void deleteStoreOrderIdTest() {
         int id = generatedId;
@@ -66,7 +66,7 @@ public class StoreTest {
         storeApi.deleteStoreOrderId(200, id);
     }
 
-    //Отправка запроса DELETE/store/order/{orderId} для несуществующего id и проверка в ответе статус кода, а также ключей и полей
+    //РћС‚РїСЂР°РІРєР° Р·Р°РїСЂРѕСЃР° DELETE/store/order/{orderId} РґР»СЏ РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ id Рё РїСЂРѕРІРµСЂРєР° РІ РѕС‚РІРµС‚Рµ СЃС‚Р°С‚СѓСЃ РєРѕРґР°, Р° С‚Р°РєР¶Рµ РєР»СЋС‡РµР№ Рё РїРѕР»РµР№
     @Test
     void deleteStoreOrderIncorrectIdTest() {
         storeApi.deleteStoreOrderIncorrectId(404, 123);
