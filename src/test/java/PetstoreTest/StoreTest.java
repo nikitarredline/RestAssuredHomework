@@ -12,7 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class StoreTest {
 
     private final StoreApi storeApi = new StoreApi();
-    private int generatedId = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
+    private int generatedId = ThreadLocalRandom.current().nextInt(1, 10);
     private final List<Integer> createdOrders = new ArrayList<>();
 
     //Отправка запроса POST/store/order и проверка в ответе статус кода, а также ключей и полей
@@ -46,6 +46,29 @@ public class StoreTest {
         createdOrders.add(generatedId);
     }
 
+    //Отправка запроса GET/store/order/{orderId} и проверка в ответе статус кода, а также ключей и полей
+    @Test
+    void getStoreOrderIdTest() {
+        OrderDTO orderDTO = OrderDTO.builder()
+                .id(generatedId)
+                .petId(0)
+                .quantity(0)
+                .shipDate("2025-12-16T16:59:14.135Z")
+                .status("placed")
+                .complete(true)
+                .build();
+
+        storeApi.postStoreOrder(orderDTO, 200);
+
+        storeApi.getStoreOrderId(orderDTO, 200, generatedId);
+        createdOrders.add(generatedId);
+    }
+
+    //Отправка запроса GET/store/order/{orderId} с некорректным orderId и проверка в ответе статус кода, а также ключей и полей
+    @Test
+    void getStoreIncorrectOrderIdTest() {
+        storeApi.getStoreOrderIncorrectId(404, generatedId);
+    }
 
     //Отправка запроса DELETE/store/order/{orderId} и проверка в ответе статус кода, а также ключей и полей
     @Test
@@ -66,10 +89,10 @@ public class StoreTest {
         storeApi.deleteStoreOrderId(200, id);
     }
 
-    //Отправка запроса DELETE/store/order/{orderId} для несуществующего id и проверка в ответе статус кода, а также ключей и полей
+    //Отправка запроса DELETE/store/order/{orderId} для несуществующего orderId и проверка в ответе статус кода, а также ключей и полей
     @Test
-    void deleteStoreOrderIncorrectIdTest() {
-        storeApi.deleteStoreOrderIncorrectId(404, generatedId);
+    void deleteStoreOrderIncorrectOrderIdTest() {
+        storeApi.deleteStoreOrderIncorrectOrderId(404, generatedId);
     }
 
     @AfterEach
