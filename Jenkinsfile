@@ -38,7 +38,7 @@ pipeline {
         }
     }
 
-    post {
+    post {фыв
         always {
             echo "PIPELINE FINISHED"
         }
