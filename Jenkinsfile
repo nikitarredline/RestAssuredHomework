@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        // важно: фиксируем workspace Jenkins (НЕ придумываем root)
-        WS = "${WORKSPACE}"
-    }
-
     stages {
 
         stage('Checkout') {
@@ -15,48 +10,27 @@ pipeline {
             }
         }
 
-        stage('Debug host workspace') {
+        stage('Debug') {
             steps {
                 sh '''
-                    echo "===== HOST DEBUG ====="
-                    echo "WORKSPACE=$WORKSPACE"
+                    echo "===== HOST ====="
                     pwd
                     ls -la
-                    echo "pom.xml check:"
                     test -f pom.xml && echo "POM EXISTS" || echo "POM MISSING"
                 '''
             }
         }
 
-        stage('Debug Docker mount') {
+        stage('Run tests (FIXED MOUNT)') {
             steps {
                 sh '''
-                    echo "===== DOCKER DEBUG ====="
+                    echo "===== DOCKER RUN ====="
 
                     docker run --rm \
-                        -v "$WORKSPACE:$WORKSPACE" \
-                        -w "$WORKSPACE" \
-                        alpine sh -c "
-                            echo INSIDE DOCKER;
-                            pwd;
-                            ls -la;
-                            echo 'POM check:';
-                            test -f pom.xml && echo FOUND || echo MISSING
-                        "
-                '''
-            }
-        }
-
-        stage('Run tests (FIXED)') {
-            steps {
-                sh '''
-                    echo "===== MAVEN RUN ====="
-
-                    docker run --rm \
-                        -v "$WORKSPACE:$WORKSPACE" \
-                        -w "$WORKSPACE" \
+                        -v $(pwd):/workspace \
+                        -w /workspace \
                         maven:3.9.9-eclipse-temurin-21 \
-                        mvn -e clean test
+                        mvn clean test
                 '''
             }
         }
