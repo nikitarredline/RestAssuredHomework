@@ -25,8 +25,8 @@ pipeline {
                     echo "RUN TESTS VIA DOCKER"
 
                     docker run --rm \
-                      -v "$WORKSPACE:$WORKSPACE" \
-                      -w "$WORKSPACE" \
+                      -v "$WORKSPACE:/app" \
+                      -w /app \
                       maven:3.9.9-eclipse-temurin-21 \
                       mvn clean test
                 '''
