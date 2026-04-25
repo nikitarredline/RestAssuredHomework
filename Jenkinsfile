@@ -2,6 +2,15 @@ pipeline {
     agent any
 
     stages {
+        stage('Print real path') {
+          steps {
+            sh '''
+              echo "PWD=$(pwd)"
+              readlink -f .
+              ls -la
+            '''
+          }
+        }
 
         stage('Checkout') {
             steps {
