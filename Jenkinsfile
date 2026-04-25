@@ -12,6 +12,18 @@ pipeline {
           }
         }
 
+        stage('Test mount outside Maven') {
+          steps {
+            sh '''
+              HOST_DIR=$(pwd)
+
+              docker run --rm \
+                -v "$HOST_DIR:$HOST_DIR" \
+                alpine ls -la "$HOST_DIR"
+            '''
+          }
+        }
+
         stage('Checkout') {
             steps {
                 deleteDir()
