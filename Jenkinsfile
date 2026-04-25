@@ -24,18 +24,16 @@ pipeline {
             }
         }
 
-        stage('Run tests (FIXED PATH)') {
-            steps {
-                sh '''
-                    echo "USING HOST PATH"
+        stage('Run tests') {
+            sh '''
+            docker run --rm \
+              -v /var/jenkins_home/workspace/api_tests:/workspace \
+              -w /workspace \
+              maven:3.9.9-eclipse-temurin-21 \
+              mvn clean test
 
-                    docker run --rm \
-                        -v /root/jenkins_home/workspace/api_tests:/workspace \
-                        -w /workspace \
-                        maven:3.9.9-eclipse-temurin-21 \
-                        mvn clean test
-                '''
-            }
+            ls -la /var/jenkins_home/workspace/api_tests/target/allure-results || true
+            '''
         }
 
         stage('Check Allure results') {
@@ -47,15 +45,13 @@ pipeline {
         }
 
         stage('Allure Report') {
-            steps {
-                allure([
-                    includeProperties: false,
-                    jdk: '',
-                    properties: [],
-                    reportBuildPolicy: 'ALWAYS',
-                    results: [[path: 'target/allure-results']]
-                ])
-            }
+            allure([
+                includeProperties: false,
+                jdk: '',
+                properties: [],
+                reportBuildPolicy: 'ALWAYS',
+                results: [[path: 'target/allure-results']]
+            ])
         }
     }
 

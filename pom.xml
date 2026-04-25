@@ -77,11 +77,18 @@
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-junit5</artifactId>
             <version>${allure-junit5.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-junit-platform</artifactId>
             <version>${allure-junit5.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.9.22</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -106,15 +113,23 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
                 <configuration>
+
                     <systemPropertyVariables>
                         <base.url>${base.url}</base.url>
                         <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
                     </systemPropertyVariables>
+
+                    <argLine>
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/1.9.22/aspectjweaver-1.9.22.jar"
+                    </argLine>
+
                     <properties>
                         <configurationParameters>
                             junit.jupiter.extensions.autodetection.enabled = true
                         </configurationParameters>
                     </properties>
+
+                    <useModulePath>false</useModulePath>
                 </configuration>
             </plugin>
 
