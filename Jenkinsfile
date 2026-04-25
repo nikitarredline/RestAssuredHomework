@@ -20,16 +20,12 @@ pipeline {
             }
         }
 
-        stage('Run tests in Docker') {
+        stage('Run tests') {
             steps {
                 sh '''
-                    WORKDIR=$(pwd)
-
-                    echo "Using WORKDIR=$WORKDIR"
-
                     docker run --rm \
-                      -v "$WORKDIR:$WORKDIR" \
-                      -w "$WORKDIR" \
+                      -v /root/jenkins_home/workspace/api_tests:/workspace \
+                      -w /workspace \
                       maven:3.9.9-eclipse-temurin-21 \
                       mvn clean test
                 '''
