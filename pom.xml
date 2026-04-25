@@ -108,7 +108,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Checkstyle -->фыв
+            <!-- Checkstyle -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
