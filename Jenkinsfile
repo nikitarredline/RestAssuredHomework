@@ -3,17 +3,10 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                deleteDir()
-                checkout scm
-            }
-        }
-
-        stage('Build Docker image') {
+        stage('Pull image') {
             steps {
                 sh '''
-                    docker build -t api-tests .
+                    docker pull 89.124.113.71:5005/api-tests:1.0
                 '''
             }
         }
@@ -21,7 +14,10 @@ pipeline {
         stage('Run tests') {
             steps {
                 sh '''
-                    docker run --rm api-tests
+                    docker run --rm \
+                      -v /root/jenkins_home/workspace/api_tests:/workspace \
+                      -w /workspace \
+                      89.124.113.71:5005/api-tests:1.0
                 '''
             }
         }
