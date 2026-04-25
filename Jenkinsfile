@@ -9,10 +9,11 @@ pipeline {
             }
         }
 
-        stage('Debug') {
+        stage('Debug workspace') {
             steps {
                 sh '''
-                    echo WORKSPACE=$WORKSPACE
+                    echo "WORKSPACE=$WORKSPACE"
+                    pwd
                     ls -la
                 '''
             }
@@ -21,13 +22,13 @@ pipeline {
         stage('Run tests') {
             steps {
                 sh '''
-                    echo RUN TESTS VIA DOCKER
+                    echo "RUN TESTS VIA DOCKER"
 
                     docker run --rm \
-                      -v $WORKSPACE:/root \
-                      -w /root \
+                      -v "$WORKSPACE:$WORKSPACE" \
+                      -w "$WORKSPACE" \
                       maven:3.9.9-eclipse-temurin-21 \
-                      bash -c "mvn clean test"
+                      mvn clean test
                 '''
             }
         }
