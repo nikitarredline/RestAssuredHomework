@@ -24,7 +24,7 @@ pipeline {
             steps {
                 sh '''
                     docker run --rm \
-                      -v /var/jenkins_home/workspace/api_tests:/workspace \
+                      -v /root/jenkins_home/workspace/api_tests:/workspace \
                       -w /workspace \
                       maven:3.9.9-eclipse-temurin-21 \
                       mvn clean test
