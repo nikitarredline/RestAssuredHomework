@@ -15,17 +15,15 @@ pipeline {
                 sh '''
                     echo "WORKSPACE=$WORKSPACE"
                     pwd
-                    ls -la $WORKSPACE
+                    ls -la
                 '''
             }
         }
 
-        stage('Verify mount') {
+        stage('Verify POM on host') {
             steps {
                 sh '''
-                    docker run --rm \
-                      -v "$WORKSPACE:$WORKSPACE" \
-                      alpine sh -c "ls -la $WORKSPACE && test -f $WORKSPACE/pom.xml && echo POM_OK || echo POM_MISSING"
+                    test -f "$WORKSPACE/pom.xml" && echo "POM EXISTS ON HOST" || echo "POM MISSING ON HOST"
                 '''
             }
         }
@@ -33,34 +31,32 @@ pipeline {
         stage('Run tests') {
             steps {
                 sh '''
-                    echo "Running tests in Docker using Jenkins workspace"
-
                     docker run --rm \
-                      -v "$WORKSPACE:$WORKSPACE" \
-                      -w "$WORKSPACE" \
+                      -v "$WORKSPACE:/workspace" \
+                      -w /workspace \
                       maven:3.9.9-eclipse-temurin-21 \
                       mvn clean test
+                '''
+            }
+        }
 
-                    ls -la $WORKSPACE/target/allure-results || true
+        stage('Check Allure results') {
+            steps {
+                sh '''
+                    ls -la "$WORKSPACE/target/allure-results" || true
                 '''
             }
         }
 
         stage('Allure Report') {
             steps {
-                script {
-                    if (fileExists('target/allure-results')) {
-                        allure([
-                            includeProperties: false,
-                            jdk: '',
-                            properties: [],
-                            reportBuildPolicy: 'ALWAYS',
-                            results: [[path: 'target/allure-results']]
-                        ])
-                    } else {
-                        echo "NO ALLURE RESULTS FOUND"
-                    }
-                }
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    properties: [],
+                    reportBuildPolicy: 'ALWAYS',
+                    results: [[path: 'target/allure-results']]
+                ])
             }
         }
     }
