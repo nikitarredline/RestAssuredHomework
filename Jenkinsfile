@@ -21,6 +21,16 @@ pipeline {
             }
         }
 
+        stage('Verify mount INSIDE container') {
+            steps {
+                sh '''
+                    docker run --rm \
+                      -v "$WORKSPACE:/workspace" \
+                      alpine sh -c "ls -la /workspace && test -f /workspace/pom.xml && echo POM_OK || echo POM_MISSING"
+                '''
+            }
+        }
+
         stage('Run tests') {
             steps {
                 sh '''
