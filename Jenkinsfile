@@ -15,7 +15,7 @@ pipeline {
                 sh '''
                     echo "WORKSPACE=$WORKSPACE"
                     pwd
-                    ls -la
+                    ls -la $WORKSPACE
                 '''
             }
         }
@@ -23,13 +23,15 @@ pipeline {
         stage('Run tests') {
             steps {
                 sh '''
+                    echo "Using workspace: $WORKSPACE"
+
                     docker run --rm \
-                      -v /root/jenkins_home/workspace/api_tests:/workspace \
+                      -v $WORKSPACE:/workspace \
                       -w /workspace \
                       maven:3.9.9-eclipse-temurin-21 \
                       mvn clean test
 
-                    ls -la /var/jenkins_home/workspace/api_tests/target/allure-results || true
+                    ls -la $WORKSPACE/target/allure-results || true
                 '''
             }
         }
@@ -50,9 +52,6 @@ pipeline {
     post {
         always {
             echo "PIPELINE FINISHED"
-        }
-        failure {
-            echo "STATUS: FAILED"
         }
     }
 }
