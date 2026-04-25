@@ -25,20 +25,19 @@ pipeline {
             }
         }
 
-        stage('Run tests (Docker Maven)') {
+        stage('Run tests') {
             steps {
                 sh '''
-                    set +e
-
-                    echo "===== RUN TESTS ====="
+                    echo "WORKSPACE=$WORKSPACE"
+                    ls -la $WORKSPACE
 
                     docker run --rm \
-                      -v $HOST_WORKSPACE:/workspace \
-                      -w /workspace \
-                      maven:3.9.9-eclipse-temurin-21 \
-                      mvn clean test
+                        -v "$WORKSPACE:/home/project" \
+                        -w /home/project \
+                        maven:3.9.9-eclipse-temurin-21 \
+                        mvn clean test
 
-                    echo "TESTS FINISHED (ignore exit code for CI)"
+                    ls -la $WORKSPACE/target/allure-results || true
                 '''
             }
         }
