@@ -42,16 +42,19 @@ pipeline {
             }
         }
 
-        stage('Run tests (FIXED MOUNT)') {
+        stage('Run tests') {
             steps {
                 sh '''
-                    echo "===== DOCKER RUN ====="
+                    set -e
+
+                    echo "WORKSPACE (Jenkins): $WORKSPACE"
+                    echo "HOST PATH used for Docker: /root/jenkins_home/workspace/api_tests"
 
                     docker run --rm \
-                        -v $(pwd):/workspace \
-                        -w /workspace \
-                        maven:3.9.9-eclipse-temurin-21 \
-                        mvn clean test
+                      -v /root/jenkins_home/workspace/api_tests:/workspace \
+                      -w /workspace \
+                      maven:3.9.9-eclipse-temurin-21 \
+                      mvn clean test
                 '''
             }
         }
