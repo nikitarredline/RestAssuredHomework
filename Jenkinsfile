@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        HOST_WORKSPACE = "/root/jenkins_home/workspace/api_tests"
-    }
-
     stages {
 
         stage('Checkout') {
@@ -14,30 +10,30 @@ pipeline {
             }
         }
 
-        stage('Debug workspace') {
+        stage('Debug paths') {
             steps {
                 sh '''
-                    echo "===== DEBUG HOST ====="
+                    echo "JENKINS WORKSPACE: $WORKSPACE"
                     pwd
                     ls -la
-                    echo "WORKSPACE = $WORKSPACE"
+
+                    echo "HOST ROOT CHECK:"
+                    ls -la /root/jenkins_home/workspace/api_tests || true
+                    ls -la /var/jenkins_home/workspace/api_tests || true
                 '''
             }
         }
 
-        stage('Run tests') {
+        stage('Run tests (FIXED PATH)') {
             steps {
                 sh '''
-                    echo "WORKSPACE=$WORKSPACE"
-                    ls -la $WORKSPACE
+                    echo "USING HOST PATH"
 
                     docker run --rm \
-                        -v "$WORKSPACE:/home/project" \
-                        -w /home/project \
+                        -v /root/jenkins_home/workspace/api_tests:/workspace \
+                        -w /workspace \
                         maven:3.9.9-eclipse-temurin-21 \
                         mvn clean test
-
-                    ls -la $WORKSPACE/target/allure-results || true
                 '''
             }
         }
@@ -45,8 +41,7 @@ pipeline {
         stage('Check Allure results') {
             steps {
                 sh '''
-                    echo "===== ALLURE RESULTS ====="
-                    ls -la allure-results || echo "NO ALLURE RESULTS"
+                    ls -la /root/jenkins_home/workspace/api_tests/target/allure-results || true
                 '''
             }
         }
@@ -58,7 +53,7 @@ pipeline {
                     jdk: '',
                     properties: [],
                     reportBuildPolicy: 'ALWAYS',
-                    results: [[path: 'allure-results']]
+                    results: [[path: 'target/allure-results']]
                 ])
             }
         }
@@ -67,14 +62,6 @@ pipeline {
     post {
         always {
             echo "PIPELINE FINISHED"
-        }
-
-        success {
-            echo "STATUS: SUCCESS"
-        }
-
-        failure {
-            echo "STATUS: FAILED (tests likely failed)"
         }
     }
 }
