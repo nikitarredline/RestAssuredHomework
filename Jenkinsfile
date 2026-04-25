@@ -1,28 +1,13 @@
 pipeline {
     agent any
 
+    environment {
+        PROJECT_NAME = "api_tests"
+
+        HOST_WORKSPACE = "/root/jenkins_home/workspace/api_tests"
+    }
+
     stages {
-        stage('Print real path') {
-          steps {
-            sh '''
-              echo "PWD=$(pwd)"
-              readlink -f .
-              ls -la
-            '''
-          }
-        }
-
-        stage('Test mount outside Maven') {
-          steps {
-            sh '''
-              HOST_DIR=$(pwd)
-
-              docker run --rm \
-                -v "$HOST_DIR:$HOST_DIR" \
-                alpine ls -la "$HOST_DIR"
-            '''
-          }
-        }
 
         stage('Checkout') {
             steps {
@@ -31,31 +16,52 @@ pipeline {
             }
         }
 
-        stage('Debug') {
+        stage('Debug workspace') {
             steps {
                 sh '''
-                    echo "===== HOST ====="
+                    echo "===== HOST DEBUG ====="
                     pwd
                     ls -la
-                    test -f pom.xml && echo "POM EXISTS" || echo "POM MISSING"
+                    echo "WORKSPACE (Jenkins): $WORKSPACE"
                 '''
             }
         }
 
-        stage('Run tests') {
+        stage('Run tests (Docker Maven)') {
             steps {
                 sh '''
                     set -e
 
-                    echo "WORKSPACE (Jenkins): $WORKSPACE"
-                    echo "HOST PATH used for Docker: /root/jenkins_home/workspace/api_tests"
+                    echo "===== RUN TESTS ====="
+                    echo "HOST WORKSPACE = $HOST_WORKSPACE"
 
                     docker run --rm \
-                      -v /root/jenkins_home/workspace/api_tests:/workspace \
+                      -v $HOST_WORKSPACE:/workspace \
                       -w /workspace \
                       maven:3.9.9-eclipse-temurin-21 \
                       mvn clean test
                 '''
+            }
+        }
+
+        stage('Allure Results Check') {
+            steps {
+                sh '''
+                    echo "===== ALLURE RESULTS CHECK ====="
+                    ls -la allure-results || echo "NO ALLURE RESULTS FOLDER"
+                '''
+            }
+        }
+
+        stage('Allure') {
+            steps {
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    properties: [],
+                    reportBuildPolicy: 'ALWAYS',
+                    results: [[path: 'allure-results']]
+                ])
             }
         }
     }
@@ -63,6 +69,10 @@ pipeline {
     post {
         always {
             echo "PIPELINE FINISHED"
+        }
+
+        failure {
+            echo "PIPELINE FAILED"
         }
     }
 }
