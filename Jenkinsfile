@@ -10,16 +10,6 @@ pipeline {
             }
         }
 
-        stage('Debug') {
-            steps {
-                sh '''
-                    echo "HOST WORKSPACE:"
-                    pwd
-                    ls -la
-                '''
-            }
-        }
-
         stage('Run tests') {
             steps {
                 sh '''
@@ -32,15 +22,15 @@ pipeline {
             }
         }
 
-        stage('Allure Report') {
+        stage('Generate Allure Report') {
             steps {
-                allure([
-                    includeProperties: false,
-                    jdk: '',
-                    properties: [],
-                    reportBuildPolicy: 'ALWAYS',
-                    results: [[path: 'target/allure-results']]
-                ])
+                sh '''
+                    docker run --rm \
+                      -v /root/jenkins_home/workspace/api_tests:/workspace \
+                      -w /workspace \
+                      maven:3.9.9-eclipse-temurin-21 \
+                      mvn allure:report || true
+                '''
             }
         }
     }
