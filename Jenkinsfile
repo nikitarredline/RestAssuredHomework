@@ -12,9 +12,9 @@ pipeline {
         stage('Debug workspace') {
             steps {
                 sh '''
-                    echo "WORKSPACE:"
+                    echo WORKSPACE=$WORKSPACE
                     pwd
-                    ls -R
+                    ls -la
                 '''
             }
         }
@@ -28,23 +28,21 @@ pipeline {
                       -v $WORKSPACE:/workspace \
                       -w /workspace \
                       maven:3.9.9-eclipse-temurin-21 \
-                      mvn -f /workspace/**/pom.xml clean test
+                      mvn clean test
                 '''
             }
         }
 
         stage('Allure Report') {
             steps {
-                sh '''
-                    echo "Generate report (if configured)"
-                '''
+                echo "Allure stage"
             }
         }
     }
 
     post {
         always {
-            echo 'PIPELINE FINISHED'
+            echo "PIPELINE FINISHED"
         }
     }
 }
