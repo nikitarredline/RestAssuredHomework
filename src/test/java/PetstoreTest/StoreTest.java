@@ -1,6 +1,8 @@
 package PetstoreTest;
 
 import dto.OrderDTO;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import services.StoreApi;
@@ -16,6 +18,8 @@ public class StoreTest {
     private final List<Integer> createdOrders = new ArrayList<>();
 
     //Отправка запроса POST/store/order и проверка в ответе статус кода, а также ключей и полей
+    @Epic("API Tests")
+    @Feature("Store")
     @Test
     void postStoreOrderTest() {
         OrderDTO orderDTO = OrderDTO.builder()
@@ -32,6 +36,8 @@ public class StoreTest {
     }
 
     //Отправка запроса POST/store/order без поля status и проверка в ответе статус кода, а также ключей и полей
+    @Epic("API Tests")
+    @Feature("Store")
     @Test
     void postStoreOrderWithoutStatusTest() {
         OrderDTO orderDTO = OrderDTO.builder()
@@ -47,6 +53,8 @@ public class StoreTest {
     }
 
     //Отправка запроса GET/store/order/{orderId} и проверка в ответе статус кода, а также ключей и полей
+    @Epic("API Tests")
+    @Feature("Store")
     @Test
     void getStoreOrderIdTest() {
         OrderDTO orderDTO = OrderDTO.builder()
@@ -65,12 +73,16 @@ public class StoreTest {
     }
 
     //Отправка запроса GET/store/order/{orderId} с некорректным orderId и проверка в ответе статус кода, а также ключей и полей
+    @Epic("API Tests")
+    @Feature("Store")
     @Test
     void getStoreIncorrectOrderIdTest() {
         storeApi.getStoreOrderIncorrectId(404, generatedId);
     }
 
     //Отправка запроса DELETE/store/order/{orderId} и проверка в ответе статус кода, а также ключей и полей
+    @Epic("API Tests")
+    @Feature("Store")
     @Test
     void deleteStoreOrderIdTest() {
         int id = generatedId;
@@ -90,6 +102,8 @@ public class StoreTest {
     }
 
     //Отправка запроса DELETE/store/order/{orderId} для несуществующего orderId и проверка в ответе статус кода, а также ключей и полей
+    @Epic("API Tests")
+    @Feature("Store")
     @Test
     void deleteStoreOrderIncorrectOrderIdTest() {
         storeApi.deleteStoreOrderIncorrectOrderId(404, generatedId);
