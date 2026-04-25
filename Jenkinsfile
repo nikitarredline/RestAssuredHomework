@@ -1,10 +1,16 @@
 pipeline {
     agent any
 
+    environment {
+        // важно: фиксируем workspace Jenkins (НЕ придумываем root)
+        WS = "${WORKSPACE}"
+    }
+
     stages {
 
         stage('Checkout') {
             steps {
+                deleteDir()
                 checkout scm
             }
         }
@@ -12,53 +18,45 @@ pipeline {
         stage('Debug host workspace') {
             steps {
                 sh '''
-                    echo "===== JENKINS DEBUG ====="
-                    echo "WORKSPACE = $WORKSPACE"
+                    echo "===== HOST DEBUG ====="
+                    echo "WORKSPACE=$WORKSPACE"
                     pwd
                     ls -la
-                    echo "========================="
+                    echo "pom.xml check:"
+                    test -f pom.xml && echo "POM EXISTS" || echo "POM MISSING"
                 '''
             }
         }
 
-        stage('Debug Docker visibility') {
+        stage('Debug Docker mount') {
             steps {
                 sh '''
-                    echo "===== DOCKER MOUNT TEST ====="
+                    echo "===== DOCKER DEBUG ====="
 
                     docker run --rm \
-                      -v "$WORKSPACE:/app" \
-                      alpine sh -c "echo INSIDE DOCKER; pwd; ls -la /app"
-
-                    echo "============================="
+                        -v "$WORKSPACE:$WORKSPACE" \
+                        -w "$WORKSPACE" \
+                        alpine sh -c "
+                            echo INSIDE DOCKER;
+                            pwd;
+                            ls -la;
+                            echo 'POM check:';
+                            test -f pom.xml && echo FOUND || echo MISSING
+                        "
                 '''
             }
         }
 
-        stage('Check pom.xml explicitly') {
-            steps {
-                sh '''
-                    echo "===== POM CHECK ====="
-
-                    docker run --rm \
-                      -v "$WORKSPACE:/app" \
-                      alpine sh -c "test -f /app/pom.xml && echo POM FOUND || echo POM NOT FOUND"
-
-                    echo "====================="
-                '''
-            }
-        }
-
-        stage('Run Maven (only if OK)') {
+        stage('Run tests (FIXED)') {
             steps {
                 sh '''
                     echo "===== MAVEN RUN ====="
 
                     docker run --rm \
-                      -v "$WORKSPACE:/app" \
-                      -w /app \
-                      maven:3.9.9-eclipse-temurin-21 \
-                      mvn clean test
+                        -v "$WORKSPACE:$WORKSPACE" \
+                        -w "$WORKSPACE" \
+                        maven:3.9.9-eclipse-temurin-21 \
+                        mvn -e clean test
                 '''
             }
         }
