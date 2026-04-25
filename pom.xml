@@ -16,6 +16,7 @@
         <json-validator.version>5.5.5</json-validator.version>
         <allure-junit5.version>2.34.0</allure-junit5.version>
         <allure-maven.version>2.12.0</allure-maven.version>
+        <aspectj.version>1.9.22</aspectj.version>
 
         <maven.version>3.13.0</maven.version>
         <maven.compiler.source>21</maven.compiler.source>
@@ -85,10 +86,12 @@
             <version>${allure-junit5.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Aspectj -->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <version>1.9.22</version>
+            <version>${aspectj.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
