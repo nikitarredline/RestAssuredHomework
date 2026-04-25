@@ -9,11 +9,10 @@ pipeline {
             }
         }
 
-        stage('Debug workspace') {
+        stage('Debug') {
             steps {
                 sh '''
                     echo WORKSPACE=$WORKSPACE
-                    pwd
                     ls -la
                 '''
             }
@@ -25,17 +24,11 @@ pipeline {
                     echo RUN TESTS VIA DOCKER
 
                     docker run --rm \
-                      -v $WORKSPACE:/workspace \
-                      -w /workspace \
+                      -v $WORKSPACE:/root \
+                      -w /root \
                       maven:3.9.9-eclipse-temurin-21 \
-                      mvn clean test
+                      bash -c "mvn clean test"
                 '''
-            }
-        }
-
-        stage('Allure Report') {
-            steps {
-                echo "Allure stage"
             }
         }
     }
