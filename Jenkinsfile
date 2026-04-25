@@ -10,40 +10,28 @@ pipeline {
             }
         }
 
-        stage('Debug workspace') {
+        stage('Debug') {
             steps {
                 sh '''
-                    echo "WORKSPACE=$WORKSPACE"
+                    echo "HOST WORKSPACE:"
                     pwd
                     ls -la
                 '''
             }
         }
 
-        stage('Verify POM on host') {
+        stage('Run tests in Docker') {
             steps {
                 sh '''
-                    test -f "$WORKSPACE/pom.xml" && echo "POM EXISTS ON HOST" || echo "POM MISSING ON HOST"
-                '''
-            }
-        }
+                    WORKDIR=$(pwd)
 
-        stage('Run tests') {
-            steps {
-                sh '''
+                    echo "Using WORKDIR=$WORKDIR"
+
                     docker run --rm \
-                      -v "$WORKSPACE:/workspace" \
-                      -w /workspace \
+                      -v "$WORKDIR:$WORKDIR" \
+                      -w "$WORKDIR" \
                       maven:3.9.9-eclipse-temurin-21 \
                       mvn clean test
-                '''
-            }
-        }
-
-        stage('Check Allure results') {
-            steps {
-                sh '''
-                    ls -la "$WORKSPACE/target/allure-results" || true
                 '''
             }
         }
@@ -64,9 +52,6 @@ pipeline {
     post {
         always {
             echo "PIPELINE FINISHED"
-        }
-        failure {
-            echo "STATUS: FAILED"
         }
     }
 }
