@@ -15,18 +15,17 @@ pipeline {
                 sh '''
                     echo "WORKSPACE=$WORKSPACE"
                     pwd
-                    ls -la
                     ls -la $WORKSPACE
                 '''
             }
         }
 
-        stage('Verify mount INSIDE container') {
+        stage('Verify mount') {
             steps {
                 sh '''
                     docker run --rm \
-                      -v "$WORKSPACE:/workspace" \
-                      alpine sh -c "ls -la /workspace && test -f /workspace/pom.xml && echo POM_OK || echo POM_MISSING"
+                      -v "$WORKSPACE:$WORKSPACE" \
+                      alpine sh -c "ls -la $WORKSPACE && test -f $WORKSPACE/pom.xml && echo POM_OK || echo POM_MISSING"
                 '''
             }
         }
@@ -34,16 +33,14 @@ pipeline {
         stage('Run tests') {
             steps {
                 sh '''
-                    echo "RUN MAVEN IN DOCKER"
-                    echo "WORKSPACE=$WORKSPACE"
+                    echo "Running tests in Docker using Jenkins workspace"
 
                     docker run --rm \
-                      -v "$WORKSPACE:/workspace" \
-                      -w /workspace \
+                      -v "$WORKSPACE:$WORKSPACE" \
+                      -w "$WORKSPACE" \
                       maven:3.9.9-eclipse-temurin-21 \
                       mvn clean test
 
-                    echo "CHECK ALLURE RESULTS"
                     ls -la $WORKSPACE/target/allure-results || true
                 '''
             }
