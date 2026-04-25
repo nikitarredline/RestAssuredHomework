@@ -22,15 +22,13 @@ pipeline {
             }
         }
 
-        stage('Generate Allure Report') {
+        stage('Allure Report') {
             steps {
-                sh '''
-                    docker run --rm \
-                      -v /root/jenkins_home/workspace/api_tests:/workspace \
-                      -w /workspace \
-                      maven:3.9.9-eclipse-temurin-21 \
-                      mvn allure:report || true
-                '''
+                allure([
+                    includeProperties: false,
+                    reportBuildPolicy: 'ALWAYS',
+                    results: [[path: 'target/allure-results']]
+                ])
             }
         }
     }
